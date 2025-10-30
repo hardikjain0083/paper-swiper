@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: paper-swiper
+    runtime: python310
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: MONGODB_ATLAS_URI
+        scope: run
+      - key: CORE_API_KEY
+        scope: run
+      - key: FLASK_ENV
+        value: production
