@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI & Computer Science - Today's Research</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 AI & Computer Science</h1>
+        <p>Today's Latest Research Papers</p>
+        <p class="subtitle">📅 Updated Daily at Midnight IST</p>
+    </div>
+    
+    <div class="stats" id="stats">
+        <span id="paperStatus">Loading today's papers...</span>
+    </div>
+    
+    <div class="card-container" id="cardContainer">
+        <div class="loading">Fetching today's AI and CS papers...</div>
+    </div>
+    
+    <div class="footer">
+        <p>✨ Swipe through the latest research • Updated automatically every day</p>
+    </div>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
