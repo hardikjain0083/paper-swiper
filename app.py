@@ -22,19 +22,44 @@ MONGODB_ATLAS_URI = os.getenv('MONGODB_ATLAS_URI')
 CORE_API_KEY = os.getenv('CORE_API_KEY')
 CORE_API_URL = "https://api.core.ac.uk/v3/search/works"
 
-# AI and Computer Science keywords
-AI_CS_KEYWORDS = [
-    "artificial intelligence", "machine learning", "deep learning", "neural network",
-    "natural language processing", "NLP", "computer vision", "reinforcement learning",
-    "data science", "big data", "cloud computing", "edge computing", "IoT",
-    "internet of things", "algorithm", "software engineering", "web development",
-    "blockchain", "cryptocurrency", "computer graphics", "augmented reality",
-    "virtual reality", "AR VR", "cybersecurity", "network security", "database",
-    "distributed systems", "parallel computing", "GPU computing", "quantum computing",
-    "chatbot", "LLM", "large language model", "transformer", "BERT", "GPT",
-    "computer network", "API", "microservices", "DevOps", "automation", "data mining",
-    "knowledge graph", "recommendation system", "object detection", "semantic segmentation"
-]
+# Domain-specific keywords
+DOMAIN_KEYWORDS = {
+    'artificial_intelligence': [
+        "artificial intelligence", "machine learning", "deep learning", "neural network",
+        "natural language processing", "NLP", "LLM", "large language model",
+        "transformer", "BERT", "GPT", "chatbot"
+    ],
+    'computer_vision': [
+        "computer vision", "object detection", "semantic segmentation",
+        "image processing", "computer graphics", "augmented reality",
+        "virtual reality", "AR VR"
+    ],
+    'data_science': [
+        "data science", "big data", "data mining", "data analytics",
+        "recommendation system", "knowledge graph", "data visualization",
+        "statistical analysis"
+    ],
+    'cloud_computing': [
+        "cloud computing", "edge computing", "distributed systems",
+        "microservices", "DevOps", "API", "containerization",
+        "serverless"
+    ],
+    'cybersecurity': [
+        "cybersecurity", "network security", "information security",
+        "cryptography", "blockchain", "cryptocurrency", "security protocols",
+        "penetration testing"
+    ],
+    'software_engineering': [
+        "software engineering", "web development", "algorithm",
+        "software architecture", "design patterns", "API design",
+        "testing", "continuous integration"
+    ],
+    'high_performance_computing': [
+        "parallel computing", "GPU computing", "quantum computing",
+        "high performance computing", "distributed computing",
+        "supercomputing", "CUDA", "optimization"
+    ]
+}
 
 # MongoDB connection
 try:
@@ -85,26 +110,36 @@ def get_page_count(paper_data):
     except Exception as e:
         return 0
 
-def is_ai_cs_paper(paper):
-    """Check if paper is about AI or Computer Science"""
+def get_paper_domains(paper):
+    """Identify domains that a paper belongs to"""
     title = paper.get('title', '').lower()
     abstract = paper.get('abstract', '').lower()
     keywords = paper.get('keywords', [])
     
     searchable_text = f"{title} {abstract} {' '.join(keywords)}".lower()
+    domains = []
     
-    for keyword in AI_CS_KEYWORDS:
-        if keyword.lower() in searchable_text:
-            return True
+    for domain, keywords in DOMAIN_KEYWORDS.items():
+        for keyword in keywords:
+            if keyword.lower() in searchable_text:
+                domains.append(domain)
+                break
     
-    return False
+    return domains
+
+def is_ai_cs_paper(paper):
+    """Check if paper is about AI or Computer Science"""
+    return len(get_paper_domains(paper)) > 0
 
 def fetch_and_store_papers():
     """Fetch recent AI and CS papers and store in MongoDB"""
     try:
         logger.info("=" * 70)
-        logger.info("Starting daily paper fetch from CORE API...")
+        logger.info("Starting paper fetch from CORE API...")
         logger.info("=" * 70)
+        
+        # Initialize domain stats for this update
+        domain_stats = {domain: 0 for domain in DOMAIN_KEYWORDS.keys()}
         
         end_date = datetime.now()
         start_date = end_date - timedelta(days=7)
@@ -161,6 +196,7 @@ def fetch_and_store_papers():
                         'doi': paper.get('doi', ''),
                         'pageCount': page_count if page_count > 0 else None,
                         'keywords': paper.get('keywords', [])[:5],
+                        'domains': get_paper_domains(paper),
                         # store as string like 'YYYY-MM-DD' so queries and storage are consistent
                         'fetchedDate': today_str,
                         'fetchedAt': datetime.now()
@@ -175,16 +211,30 @@ def fetch_and_store_papers():
                     
                     if result.upserted_id or result.modified_count > 0:
                         inserted_count += 1
+                        # Update domain stats
+                        for domain in paper_obj['domains']:
+                            domain_stats[domain] += 1
                         logger.info(f"✓ Stored: {title[:60]}... ({page_count} pages)")
                         
-                        if inserted_count >= 50:  # Limit to 50 papers per day
+                        if inserted_count >= 50:  # Limit to 50 papers per update
                             break
                     
                 except Exception as e:
                     logger.warning(f"Error processing paper: {str(e)}")
                     continue
             
+            # Store update statistics
+            update_stats = {
+                'timestamp': datetime.now(),
+                'total_papers': inserted_count,
+                'domain_stats': domain_stats
+            }
+            db['update_stats'].insert_one(update_stats)
+            
             logger.info(f"✓ Successfully stored {inserted_count} papers")
+            for domain, count in domain_stats.items():
+                if count > 0:
+                    logger.info(f"  - {domain}: {count} papers")
             logger.info("=" * 70)
             
         else:
@@ -211,8 +261,9 @@ def get_papers():
         today = datetime.now().date()
         today_str = today.isoformat()
 
+        # Include papers fetched today or promoted for today
         papers = list(papers_collection.find(
-            {'fetchedDate': today_str},
+            {'$or': [{'fetchedDate': today_str}, {'promotedDates': today_str}]},
             {'_id': 0}
         ).sort('publishedDate', -1).limit(100))
 
@@ -226,6 +277,105 @@ def get_papers():
         })
     except Exception as e:
         logger.error(f"Error in get_papers: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/domains', methods=['GET'])
+def get_domains():
+    """Get list of available domains"""
+    try:
+        domains = sorted(DOMAIN_KEYWORDS.keys())
+        domain_names = {
+            'artificial_intelligence': 'Artificial Intelligence',
+            'computer_vision': 'Computer Vision',
+            'data_science': 'Data Science',
+            'cloud_computing': 'Cloud Computing',
+            'cybersecurity': 'Cybersecurity',
+            'software_engineering': 'Software Engineering',
+            'high_performance_computing': 'High Performance Computing'
+        }
+        
+        return jsonify({
+            'success': True,
+            'domains': [{'id': d, 'name': domain_names.get(d, d)} for d in domains]
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/papers/<domain>', methods=['GET'])
+def get_papers_by_domain(domain):
+    """Fetch today's papers for a specific domain"""
+    try:
+        today = datetime.now().date()
+        today_str = today.isoformat()
+        
+        if domain not in DOMAIN_KEYWORDS:
+            return jsonify({
+                'success': False,
+                'error': 'Invalid domain'
+            }), 400
+        
+        # Include papers fetched today or promoted for today
+        papers = list(papers_collection.find(
+            {
+                '$or': [{'fetchedDate': today_str}, {'promotedDates': today_str}],
+                'domains': domain
+            },
+            {'_id': 0}
+        ).sort('publishedDate', -1).limit(10))  # Limit to 10 papers per domain
+        
+        papers = [serialize_dates(p) for p in papers]
+        
+        return jsonify({
+            'success': True,
+            'papers': papers,
+            'count': len(papers),
+            'domain': domain,
+            'fetchDate': today_str
+        })
+    except Exception as e:
+        logger.error(f"Error in get_papers_by_domain: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/domain-stats', methods=['GET'])
+def get_domain_stats():
+    """Get domain-specific statistics"""
+    try:
+        today = datetime.now().date()
+        today_str = today.isoformat()
+        
+        # Get the last update statistics
+        last_update = db['update_stats'].find_one(
+            sort=[('timestamp', -1)]
+        )
+        
+        # Get current counts per domain
+        domain_counts = {}
+        for domain in DOMAIN_KEYWORDS.keys():
+            count = papers_collection.count_documents({
+                'fetchedDate': today_str,
+                'domains': domain
+            })
+            domain_counts[domain] = count
+        
+        return jsonify({
+            'success': True,
+            'domain_counts': domain_counts,
+            'last_update': {
+                'timestamp': last_update['timestamp'].isoformat() if last_update else None,
+                'papers_added': last_update['total_papers'] if last_update else 0,
+                'domain_stats': last_update['domain_stats'] if last_update else {}
+            }
+        })
+    except Exception as e:
         return jsonify({
             'success': False,
             'error': str(e)
@@ -255,12 +405,12 @@ def get_stats():
 # Initialize scheduler
 scheduler = BackgroundScheduler()
 
-# Schedule daily update at midnight IST (18:30 UTC)
+# Schedule hourly updates
 scheduler.add_job(
     fetch_and_store_papers,
-    trigger=CronTrigger(hour=18, minute=30, timezone='UTC'),
-    id='daily_paper_fetch',
-    name='Daily Paper Fetch from CORE API',
+    trigger=CronTrigger(minute=0, timezone='UTC'),  # Run at the start of every hour
+    id='hourly_paper_fetch',
+    name='Hourly Paper Fetch from CORE API',
     replace_existing=True
 )
 

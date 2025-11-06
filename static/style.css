@@ -21,6 +21,112 @@ body {
     animation: slideDown 0.5s ease;
 }
 
+.domain-selector {
+    width: 90%;
+    max-width: 1200px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.domain-selector h2 {
+    color: white;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+.domain-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 10px;
+}
+
+.domain-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease, background 0.3s ease;
+    cursor: pointer;
+}
+
+.domain-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.domain-card.selected {
+    background: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+}
+
+.domain-card h3 {
+    color: white;
+    margin-bottom: 15px;
+    font-size: 1.2em;
+}
+
+.domain-card button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.domain-card button:hover {
+    transform: scale(1.05);
+}
+
+.update-info {
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 20px;
+    font-size: 0.9em;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.domain-stats {
+    margin: 10px 0;
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.domain-stats span {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: 12px;
+}
+
+.new-papers {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%) !important;
+    color: white;
+    font-weight: bold;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
 .header h1 {
     font-size: 2.8em;
     margin-bottom: 5px;

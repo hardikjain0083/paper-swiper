@@ -3,15 +3,75 @@ let currentIndex = 0;
 let startX = 0;
 let currentX = 0;
 let isDragging = false;
+let currentDomain = null;
 
 const cardContainer = document.getElementById('cardContainer');
 const paperStatus = document.getElementById('paperStatus');
+const domainGrid = document.getElementById('domainGrid');
 
-// Fetch today's papers from API
-async function fetchPapers() {
+// Fetch domain statistics
+async function fetchDomainStats() {
     try {
-        paperStatus.textContent = 'Loading today\'s papers...';
-        const response = await fetch('/api/papers');
+        const response = await fetch('/api/domain-stats');
+        const data = await response.json();
+        
+        if (data.success) {
+            const { domain_counts, last_update } = data;
+            const updateTime = new Date(last_update.timestamp).toLocaleTimeString();
+            document.getElementById('lastUpdateTime').textContent = `Last Update: ${updateTime}`;
+            
+            // Update domain cards with counts and new papers
+            Object.entries(domain_counts).forEach(([domain, count]) => {
+                const newPapers = last_update.domain_stats[domain] || 0;
+                const card = document.querySelector(`[data-domain="${domain}"]`);
+                if (card) {
+                    const statsDiv = card.querySelector('.domain-stats') || document.createElement('div');
+                    statsDiv.className = 'domain-stats';
+                    statsDiv.innerHTML = `
+                        <span>${count} papers total</span>
+                        ${newPapers > 0 ? `<span class="new-papers">+${newPapers} new</span>` : ''}
+                    `;
+                    if (!card.querySelector('.domain-stats')) {
+                        card.insertBefore(statsDiv, card.querySelector('button'));
+                    }
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching domain stats:', error);
+    }
+}
+
+// Fetch available domains
+async function fetchDomains() {
+    try {
+        const response = await fetch('/api/domains');
+        const data = await response.json();
+        
+        if (data.success) {
+            const domains = data.domains;
+            domainGrid.innerHTML = domains.map(domain => `
+                <div class="domain-card" data-domain="${domain.id}">
+                    <h3>${domain.name}</h3>
+                    <div class="domain-stats">Loading stats...</div>
+                    <button onclick="selectDomain('${domain.id}')">View Papers</button>
+                </div>
+            `).join('');
+            
+            // Fetch initial stats
+            fetchDomainStats();
+        }
+    } catch (error) {
+        console.error('Error fetching domains:', error);
+        domainGrid.innerHTML = '<div class="error">Error loading domains. Please refresh.</div>';
+    }
+}
+
+// Fetch papers for selected domain
+async function fetchPapers(domain) {
+    try {
+        paperStatus.textContent = 'Loading papers...';
+        const response = await fetch(`/api/papers/${domain}`);
         const data = await response.json();
         
         if (data.success) {
@@ -184,8 +244,46 @@ function showNoMorePapers() {
     paperStatus.textContent = 'All papers reviewed - Check back tomorrow!';
 }
 
-// Initialize
-fetchPapers();
+// Select domain and fetch its papers
+function selectDomain(domain) {
+    currentDomain = domain;
+    currentIndex = 0;
+    papers = [];
+    cardContainer.innerHTML = '<div class="loading">Fetching papers for selected domain...</div>';
+    fetchPapers(domain);
+    
+    // Update UI to show selected domain
+    document.querySelectorAll('.domain-card').forEach(card => {
+        card.classList.remove('selected');
+        if (card.dataset.domain === domain) {
+            card.classList.add('selected');
+        }
+    });
+}
 
-// Refresh papers every 5 minutes to check for updates
-setInterval(fetchPapers, 5 * 60 * 1000);
+// Initialize
+fetchDomains();
+
+// Set up auto-refresh (every hour)
+setInterval(() => {
+    fetchDomainStats();
+    if (currentDomain) {
+        fetchPapers(currentDomain);
+    }
+}, 60 * 60 * 1000);  // 1 hour in milliseconds
+
+// Set up stats refresh (every minute to update "time since last update")
+setInterval(() => {
+    const lastUpdateSpan = document.getElementById('lastUpdateTime');
+    if (lastUpdateSpan && lastUpdateSpan.dataset.timestamp) {
+        const lastUpdate = new Date(lastUpdateSpan.dataset.timestamp);
+        const now = new Date();
+        const minutesAgo = Math.floor((now - lastUpdate) / (1000 * 60));
+        
+        if (minutesAgo < 60) {
+            lastUpdateSpan.textContent = `Last Update: ${minutesAgo} minute${minutesAgo === 1 ? '' : 's'} ago`;
+        } else {
+            lastUpdateSpan.textContent = `Last Update: ${lastUpdate.toLocaleTimeString()}`;
+        }
+    }
+}, 60 * 1000);  // 1 minute in milliseconds
