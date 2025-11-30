@@ -261,8 +261,9 @@ def get_papers():
         today = datetime.now().date()
         today_str = today.isoformat()
 
+        # Include papers fetched today or promoted for today
         papers = list(papers_collection.find(
-            {'fetchedDate': today_str},
+            {'$or': [{'fetchedDate': today_str}, {'promotedDates': today_str}]},
             {'_id': 0}
         ).sort('publishedDate', -1).limit(100))
 

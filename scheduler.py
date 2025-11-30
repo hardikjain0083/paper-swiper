@@ -39,6 +39,24 @@ DOMAIN_ARXIV_MAPPING = {
 # For Data Science, often cs.LG (Machine Learning) or cs.DB (Databases) are also relevant.
 # We will stick to primary categories for now.
 
+# Domain keywords (used for selecting old papers to promote when no new papers found)
+DOMAIN_KEYWORDS = {
+    'artificial_intelligence': [
+        "artificial intelligence", "machine learning", "deep learning", "neural network",
+        "natural language processing", "nlp", "llm", "large language model",
+        "transformer", "bert", "gpt", "chatbot"
+    ],
+    'computer_vision': [
+        "computer vision", "object detection", "semantic segmentation",
+        "image processing", "computer graphics", "augmented reality",
+        "virtual reality", "ar vr"
+    ],
+    'data_science': [
+        "data science", "big data", "data mining", "data analytics",
+        "recommendation system", "knowledge graph", "data visualization"
+    ],
+}
+
 # MongoDB Atlas setup
 try:
     client = MongoClient(MONGODB_ATLAS_URI)
@@ -278,6 +296,46 @@ def fetch_recent_papers_core():
         logger.error(f"Error fetching papers from CORE: {str(e)}")
         return 0
 
+
+def promote_old_papers(limit_per_domain=10):
+    """When no new papers are found, promote older domain-similar papers by inserting
+    copies with today's fetchedDate so they appear in today's listing. If an insert
+    fails due to a duplicate key, add today to the document's `promotedDates` array.
+    """
+    today_str = datetime.now().date().isoformat()
+    total_promoted = 0
+
+    for domain in DOMAIN_KEYWORDS.keys():
+        try:
+            # Find older papers for this domain (not already marked for today)
+            cursor = papers_collection.find({
+                'domains': domain,
+                'fetchedDate': {'$ne': today_str}
+            }).sort('fetchedAt', 1).limit(limit_per_domain)
+
+            for doc in cursor:
+                promoted = dict(doc)
+                promoted.pop('_id', None)
+                original_date = promoted.get('fetchedDate')
+                promoted['fetchedDate'] = today_str
+                promoted['fetchedAt'] = datetime.now()
+                promoted['promotedFrom'] = original_date
+
+                try:
+                    papers_collection.insert_one(promoted)
+                    total_promoted += 1
+                except DuplicateKeyError:
+                    # If a unique index prevents inserting a duplicate coreId, record promotion
+                    papers_collection.update_one(
+                        {'coreId': promoted.get('coreId')},
+                        {'$addToSet': {'promotedDates': today_str}}
+                    )
+        except Exception as e:
+            logger.warning(f"Error promoting papers for domain {domain}: {e}")
+
+    logger.info(f"Promoted {total_promoted} papers across domains")
+    return total_promoted
+
 def cleanup_old_papers():
     """Remove papers older than 30 days"""
     try:
@@ -344,10 +402,10 @@ if __name__ == '__main__':
     
     # Schedule daily updates at midnight IST
     scheduler = BlockingScheduler()
-    # For IST (UTC+5:30), adjust accordingly. Using 18:30 UTC = 00:00 IST
-    scheduler.add_job(daily_update_job, 'cron', hour=18, minute=30, timezone='UTC')
-    
-    logger.info("Scheduler started. Will run daily at midnight IST (18:30 UTC).")
+    # Schedule to run once every 24 hours
+    scheduler.add_job(daily_update_job, 'interval', hours=24)
+
+    logger.info("Scheduler started. Will run every 24 hours.")
     try:
         scheduler.start()
     except (KeyboardInterrupt, SystemExit):
