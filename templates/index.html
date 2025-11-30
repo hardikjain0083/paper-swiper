@@ -100,6 +100,7 @@ for paper in today:
 
     </main>
 
+<<<<<<< HEAD
 
 <!-- Reviews / Feedback -->
 <section class="reviews-section">
@@ -222,6 +223,159 @@ for paper in today:
 </section>
 
 
+=======
+    <!-- Reviews / Feedback -->
+    <section class="reviews-section">
+        <div class="reviews-header">
+            <div>
+                <h2>Trusted by early users</h2>
+                <p class="reviews-subtitle">
+                    Developers and students using this console to stay ahead with daily AI &amp; CS research.
+                </p>
+            </div>
+            <span class="reviews-tag">Community feedback</span>
+        </div>
+
+        <div class="reviews-grid">
+
+            <article class="review-card">
+                <img class="review-avatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="User photo">
+                <div class="review-body">
+                    <p class="review-text">
+                        “It feels like a personal research assistant. I open it every morning to scan through new papers.”
+                    </p>
+                    <p class="review-meta">
+                        <span class="review-name">Rahul Mehta</span>
+                        <span class="review-role">AI Student</span>
+                    </p>
+                </div>
+            </article>
+
+            <article class="review-card">
+                <img class="review-avatar" src="https://randomuser.me/api/portraits/women/44.jpg" alt="User photo">
+                <div class="review-body">
+                    <p class="review-text">
+                        “The swipe interface is addictive. Research doesn’t feel boring anymore.”
+                    </p>
+                    <p class="review-meta">
+                        <span class="review-name">Ananya Singh</span>
+                        <span class="review-role">Computer Science Undergraduate</span>
+                    </p>
+                </div>
+            </article>
+
+            <article class="review-card">
+                <img class="review-avatar" src="https://randomuser.me/api/portraits/men/75.jpg" alt="User photo">
+                <div class="review-body">
+                    <p class="review-text">
+                        “I love the clean UI. Everything looks modern and research-focused.”
+                    </p>
+                    <p class="review-meta">
+                        <span class="review-name">Arjun Patel</span>
+                        <span class="review-role">Software Engineering Student</span>
+                    </p>
+                </div>
+            </article>
+
+            <article class="review-card">
+                <img class="review-avatar" src="https://randomuser.me/api/portraits/women/61.jpg" alt="User photo">
+                <div class="review-body">
+                    <p class="review-text">
+                        “This should exist in every college. A perfect tool for tech students.”
+                    </p>
+                    <p class="review-meta">
+                        <span class="review-name">Neha Verma</span>
+                        <span class="review-role">B.Tech Final Year</span>
+                    </p>
+                </div>
+            </article>
+
+            <article class="review-card">
+                <img class="review-avatar" src="https://randomuser.me/api/portraits/men/58.jpg" alt="User photo">
+                <div class="review-body">
+                    <p class="review-text">
+                        “Saved a lot of time searching manually for quality papers.”
+                    </p>
+                    <p class="review-meta">
+                        <span class="review-name">Vikram Rao</span>
+                        <span class="review-role">Data Science Learner</span>
+                    </p>
+                </div>
+            </article>
+
+            <article class="review-card">
+                <img class="review-avatar" src="https://randomuser.me/api/portraits/women/19.jpg" alt="User photo">
+                <div class="review-body">
+                    <p class="review-text">
+                        “It actually motivates me to read papers daily.”
+                    </p>
+                    <p class="review-meta">
+                        <span class="review-name">Pooja Iyer</span>
+                        <span class="review-role">ML Enthusiast</span>
+                    </p>
+                </div>
+            </article>
+
+            <article class="review-card">
+                <img class="review-avatar" src="https://randomuser.me/api/portraits/men/11.jpg" alt="User photo">
+                <div class="review-body">
+                    <p class="review-text">
+                        “Great reference dashboard for my projects. I just select a domain and export links I need.”
+                    </p>
+                    <p class="review-meta">
+                        <span class="review-name">Karan Joshi</span>
+                        <span class="review-role">Hackathon Participant</span>
+                    </p>
+                </div>
+            </article>
+
+        </div>
+
+        <!-- Call to action: add your own review -->
+        <div class="reviews-cta">
+            <p>Want to share your experience with AI Papers Console?</p>
+            <button type="button" class="btn-review" id="openReviewModalBtn">
+                + Add your review
+            </button>
+        </div>
+
+        <!-- Review modal -->
+        <div class="review-modal" id="reviewModal" aria-hidden="true">
+            <div class="review-modal-backdrop" id="reviewModalBackdrop"></div>
+            <div class="review-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="reviewModalTitle">
+                <button class="review-modal-close" id="closeReviewModalBtn">&times;</button>
+                <h3 id="reviewModalTitle">Share your feedback</h3>
+                <p class="review-modal-subtitle">
+                    This is stored only in your browser – no data is sent to the server.
+                </p>
+                <form id="reviewForm">
+                    <div class="review-form-row">
+                        <label>
+                            Name
+                            <input type="text" id="reviewName" required placeholder="Your name">
+                        </label>
+                        <label>
+                            Role
+                            <input type="text" id="reviewRole" required placeholder="e.g. CS Student, ML Engineer">
+                        </label>
+                    </div>
+                    <label class="review-form-full">
+                        Review
+                        <textarea id="reviewText" rows="3" required placeholder="What do you like about this console?"></textarea>
+                    </label>
+                    <div class="review-form-actions">
+                        <button type="button" class="btn-review btn-review-secondary" id="cancelReviewBtn">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn-review btn-review-primary">
+                            Submit review
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+>>>>>>> c4a8ebb (feedback add button working)
 
     <!-- Footer -->
     <footer class="footer">

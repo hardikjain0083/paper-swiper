@@ -331,3 +331,80 @@ setInterval(() => {
         }
     }
 }, 60 * 1000);
+<<<<<<< HEAD
+=======
+
+/* ========== REVIEWS MODAL & DYNAMIC ADD ========== */
+
+const reviewModal = document.getElementById('reviewModal');
+const openReviewModalBtn = document.getElementById('openReviewModalBtn');
+const closeReviewModalBtn = document.getElementById('closeReviewModalBtn');
+const cancelReviewBtn = document.getElementById('cancelReviewBtn');
+const reviewModalBackdrop = document.getElementById('reviewModalBackdrop');
+const reviewForm = document.getElementById('reviewForm');
+const reviewsGrid = document.querySelector('.reviews-grid');
+
+function openReviewModal() {
+    if (!reviewModal) return;
+    reviewModal.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeReviewModal() {
+    if (!reviewModal) return;
+    reviewModal.classList.remove('is-open');
+    document.body.style.overflow = '';
+}
+
+function createReviewCard(name, role, text) {
+    const article = document.createElement('article');
+    article.className = 'review-card';
+    article.innerHTML = `
+        <img class="review-avatar"
+             src="https://randomuser.me/api/portraits/lego/1.jpg"
+             alt="User photo">
+        <div class="review-body">
+            <p class="review-text">“${text}”</p>
+            <p class="review-meta">
+                <span class="review-name">${name}</span>
+                <span class="review-role">${role}</span>
+            </p>
+        </div>
+    `;
+    return article;
+}
+
+// open
+if (openReviewModalBtn && reviewModal) {
+    openReviewModalBtn.addEventListener('click', openReviewModal);
+}
+
+// close on buttons / backdrop
+[closeReviewModalBtn, cancelReviewBtn, reviewModalBackdrop].forEach((el) => {
+    if (el) el.addEventListener('click', closeReviewModal);
+});
+
+// close on Esc
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeReviewModal();
+});
+
+// handle submit
+if (reviewForm && reviewsGrid) {
+    reviewForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById('reviewName').value.trim();
+        const role = document.getElementById('reviewRole').value.trim();
+        const text = document.getElementById('reviewText').value.trim();
+
+        if (!name || !role || !text) return;
+
+        const card = createReviewCard(name, role, text);
+        reviewsGrid.appendChild(card);
+
+        reviewForm.reset();
+        closeReviewModal();
+    });
+}
+>>>>>>> c4a8ebb (feedback add button working)
