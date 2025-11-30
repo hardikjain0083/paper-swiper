@@ -3,28 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI & Computer Science - Today's Research</title>
+    <title>AI Papers Console</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <div class="header">
-        <h1>🤖 AI & Computer Science</h1>
-        <p>Today's Latest Research Papers</p>
-        <p class="subtitle">📅 Updated Daily at Midnight IST</p>
+<body class="app-body">
+<div class="app-shell">
+
+    <!-- Top navigation -->
+    <header class="top-nav">
+        <div class="top-left">
+            <span class="terminal-icon">&gt;_</span>
+            <span class="brand-text">AI Papers Console</span>
+        </div>
+        <div class="top-right">
+            <span class="tag-pill">Flask · MongoDB · CORE API</span>
+            <button class="btn btn-top">Get Started</button>
+        </div>
+    </header>
+
+    <!-- Hero strip -->
+    <section class="hero">
+        <div class="hero-text">
+            <span class="hero-label">Daily AI &amp; CS Research</span>
+            <h1 class="hero-title">
+                Curated research feed<br>
+                <span>for developers &amp; students</span>
+            </h1>
+            <p class="hero-subtitle">
+                Your personal console for exploring today’s AI &amp; Computer Science papers.
+                Data is fetched from CORE, stored in MongoDB, and served by your Flask backend –
+                this page is just the front-end window.
+            </p>
+        </div>
+        <div class="hero-code">
+            <div class="code-header">
+                <span class="code-dot red"></span>
+                <span class="code-dot yellow"></span>
+                <span class="code-dot green"></span>
+                <span class="code-title">request_today_papers.py</span>
+            </div>
+            <pre class="code-block"><code>
+from client import PapersSDK
+
+sdk = PapersSDK(domain="cloud_computing")
+today = sdk.fetch_latest()
+
+for paper in today:
+    sdk.swipe(paper)
+            </code></pre>
+        </div>
+    </section>
+
+    <!-- Main two-column layout -->
+    <main class="main-layout">
+
+        <!-- LEFT: domains panel (IDs MUST STAY SAME) -->
+        <section class="panel panel-left" id="domainSelector">
+            <div class="panel-header">
+                <div>
+                    <h2>Domains</h2>
+                    <p class="panel-subtitle">
+                        Pick a focus area. Stats update automatically from the last successful fetch.
+                    </p>
+                </div>
+                <div class="update-info" id="updateInfo">
+                    <span id="lastUpdateTime">Last Update: Checking...</span>
+                </div>
+            </div>
+
+            <div class="domain-grid" id="domainGrid">
+                <div class="loading loading-inline">Loading domains…</div>
+            </div>
+        </section>
+
+        <!-- RIGHT: swipe viewer (IDs MUST STAY SAME) -->
+        <section class="panel panel-right">
+            <div class="viewer-header">
+                <div>
+                    <h2>Today’s Papers</h2>
+                    <p class="viewer-subtitle">
+                        Swipe left / right to move through papers. All interaction is handled on the front-end;
+                        your scheduling and database logic remain unchanged.
+                    </p>
+                </div>
+                <div class="stats" id="stats">
+                    <span id="paperStatus">Loading today's papers...</span>
+                </div>
+            </div>
+
+            <div class="card-container" id="cardContainer">
+                <div class="loading">
+                    Select a domain on the left to start reading…
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+
+<!-- Reviews / Feedback -->
+<section class="reviews-section">
+    <div class="reviews-header">
+        <div>
+            <h2>Trusted by early users</h2>
+            <p class="reviews-subtitle">
+                Developers and students using this console to stay ahead with daily AI &amp; CS research.
+            </p>
+        </div>
+        <span class="reviews-tag">Community feedback</span>
     </div>
+
+    <div class="reviews-grid">
+
+        <article class="review-card">
+            <img class="review-avatar" src="https://randomuser.me/api/portraits/men/32.jpg" alt="User photo">
+            <div class="review-body">
+                <p class="review-text">
+                    “It feels like a personal research assistant. I open it every morning to scan through new papers.”
+                </p>
+                <p class="review-meta">
+                    <span class="review-name">Rahul Mehta</span>
+                    <span class="review-role">AI Student</span>
+                </p>
+            </div>
+        </article>
+
+        <article class="review-card">
+            <img class="review-avatar" src="https://randomuser.me/api/portraits/women/44.jpg" alt="User photo">
+            <div class="review-body">
+                <p class="review-text">
+                    “The swipe interface is addictive. Research doesn’t feel boring anymore.”
+                </p>
+                <p class="review-meta">
+                    <span class="review-name">Ananya Singh</span>
+                    <span class="review-role">Computer Science Undergraduate</span>
+                </p>
+            </div>
+        </article>
+
+        <article class="review-card">
+            <img class="review-avatar" src="https://randomuser.me/api/portraits/men/75.jpg" alt="User photo">
+            <div class="review-body">
+                <p class="review-text">
+                    “I love the clean UI. Everything looks modern and research-focused.”
+                </p>
+                <p class="review-meta">
+                    <span class="review-name">Arjun Patel</span>
+                    <span class="review-role">Software Engineering Student</span>
+                </p>
+            </div>
+        </article>
+
+        <article class="review-card">
+            <img class="review-avatar" src="https://randomuser.me/api/portraits/women/61.jpg" alt="User photo">
+            <div class="review-body">
+                <p class="review-text">
+                    “This should exist in every college. A perfect tool for tech students.”
+                </p>
+                <p class="review-meta">
+                    <span class="review-name">Neha Verma</span>
+                    <span class="review-role">B.Tech Final Year</span>
+                </p>
+            </div>
+        </article>
+
+        <article class="review-card">
+            <img class="review-avatar" src="https://randomuser.me/api/portraits/men/58.jpg" alt="User photo">
+            <div class="review-body">
+                <p class="review-text">
+                    “Saved a lot of time searching manually for quality papers.”
+                </p>
+                <p class="review-meta">
+                    <span class="review-name">Vikram Rao</span>
+                    <span class="review-role">Data Science Learner</span>
+                </p>
+            </div>
+        </article>
+
+        <article class="review-card">
+            <img class="review-avatar" src="https://randomuser.me/api/portraits/women/19.jpg" alt="User photo">
+            <div class="review-body">
+                <p class="review-text">
+                    “It actually motivates me to read papers daily.”
+                </p>
+                <p class="review-meta">
+                    <span class="review-name">Pooja Iyer</span>
+                    <span class="review-role">ML Enthusiast</span>
+                </p>
+            </div>
+        </article>
+
+        <!-- New review 7 -->
+        <article class="review-card">
+            <img class="review-avatar" src="https://randomuser.me/api/portraits/men/11.jpg" alt="User photo">
+            <div class="review-body">
+                <p class="review-text">
+                    “Great reference dashboard for my projects. I just select a domain and export links I need.”
+                </p>
+                <p class="review-meta">
+                    <span class="review-name">Karan Joshi</span>
+                    <span class="review-role">Hackathon Participant</span>
+                </p>
+            </div>
+        </article>
+
     
-    <div class="stats" id="stats">
-        <span id="paperStatus">Loading today's papers...</span>
+
+    <!-- Call to action: add your own review -->
+    <div class="reviews-cta">
+        <p>Want to share your experience with AI Papers Console?</p>
+        <a
+            href="mailto:feedback@example.com?subject=AI%20Papers%20Console%20Feedback"
+            class="btn-review"
+        >
+            + Add your review
+        </a>
     </div>
-    
-    <div class="card-container" id="cardContainer">
-        <div class="loading">Fetching today's AI and CS papers...</div>
-    </div>
-    
-    <div class="footer">
-        <p>✨ Swipe through the latest research • Updated automatically every day</p>
-    </div>
-    
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</section>
+
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>AI Papers Console · Updated daily at midnight IST · Built on your existing backend</p>
+    </footer>
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

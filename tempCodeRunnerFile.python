@@ -1,0 +1,27 @@
+"""password="hardik"
+i=1
+while i<=3:
+    passwd=input("enter password\n")
+    if (passwd==password):
+        print("correct")
+        break
+    else:
+        if(i<3):
+            print("try again", 3-i ,"attempts left")
+        else:
+            print("blocked")
+        i=i+1"""
+
+password="hardik"
+for i in range (1,4):
+    passwd=input("enter password")
+    if(password==passwd):
+        print("correct")
+        break
+    else:
+        if(i<3):
+            print("try again", 3-i ,"attempts left")
+        else:
+            print("blocked")
+            i=i+1
+
