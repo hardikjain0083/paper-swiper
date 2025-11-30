@@ -159,10 +159,10 @@ body.app-body {
 
 .hero-title span {
     background: linear-gradient(120deg, #22c55e, #6366f1, #a855f7);
-<<<<<<< HEAD
+
     background-clip: text;
 =======
->>>>>>> c4a8ebb (feedback add button working)
+
     -webkit-background-clip: text;
     color: transparent;
 }
@@ -660,7 +660,7 @@ body.app-body {
 }
 
 .reviews-tag {
-<<<<<<< HEAD
+
     font-size: 0.78rem;
     padding: 5px 12px;
     border-radius: 999px;
