@@ -159,6 +159,7 @@ body.app-body {
 
 .hero-title span {
     background: linear-gradient(120deg, #22c55e, #6366f1, #a855f7);
+    background-clip: text;
     -webkit-background-clip: text;
     color: transparent;
 }

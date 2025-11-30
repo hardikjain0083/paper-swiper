@@ -1,5 +1,6 @@
 import requests
 from pymongo import MongoClient
+from pymongo.errors import DuplicateKeyError
 from datetime import datetime, timedelta
 from apscheduler.schedulers.blocking import BlockingScheduler
 import logging
