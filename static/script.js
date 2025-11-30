@@ -331,7 +331,6 @@ setInterval(() => {
         }
     }
 }, 60 * 1000);
-<<<<<<< HEAD
 =======
 
 /* ========== REVIEWS MODAL & DYNAMIC ADD ========== */
@@ -407,4 +406,4 @@ if (reviewForm && reviewsGrid) {
         closeReviewModal();
     });
 }
->>>>>>> c4a8ebb (feedback add button working)
+

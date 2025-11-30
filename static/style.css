@@ -581,7 +581,7 @@ body.app-body {
     border: 1px dashed rgba(148, 163, 184, 0.7);
 }
 
-<<<<<<< HEAD
+
 /* card scrollbar */
 
 .card::-webkit-scrollbar {
@@ -619,7 +619,7 @@ body.app-body {
     border-radius: 10px;
 }
 
->>>>>>> c4a8ebb (feedback add button working)
+
 /* ---------- FOOTER ---------- */
 
 .footer {
@@ -698,7 +698,7 @@ body.app-body {
     text-transform: uppercase;
 }
 
->>>>>>> c4a8ebb (feedback add button working)
+
 /* cards grid */
 
 .reviews-grid {
@@ -743,14 +743,14 @@ body.app-body {
 }
 
 .review-text {
-<<<<<<< HEAD
+
     font-size: 0.9rem;
     color: #e5e7eb;
 =======
     font-size: 0.95rem;
     color: #e5e7eb;
     line-height: 1.65;
->>>>>>> c4a8ebb (feedback add button working)
+
 }
 
 .review-meta {
@@ -761,10 +761,10 @@ body.app-body {
 .review-name {
     font-weight: 600;
     color: #cbd5f5;
-<<<<<<< HEAD
+
 =======
     font-size: 0.9rem;
->>>>>>> c4a8ebb (feedback add button working)
+
 }
 
 /* CTA row */
@@ -794,10 +794,9 @@ body.app-body {
     gap: 6px;
     transition: all 0.18s ease-out;
     background: transparent;
-<<<<<<< HEAD
 =======
     cursor: pointer;
->>>>>>> c4a8ebb (feedback add button working)
+
 }
 
 .btn-review:hover {
@@ -814,7 +813,7 @@ body.app-body {
     }
 }
 
-<<<<<<< HEAD
+
 =======
 /* ---------- REVIEW MODAL ---------- */
 
@@ -943,7 +942,6 @@ body.app-body {
     }
 }
 
->>>>>>> c4a8ebb (feedback add button working)
 /* ---------- PAGE OPEN ANIMATION ---------- */
 
 @keyframes fadeSlideIn {
@@ -1003,7 +1001,7 @@ body.app-body {
         padding: 20px;
     }
 }
-<<<<<<< HEAD
+
 /* ----- FORCE FIX FOR COMMUNITY FEEDBACK TAG ----- */
 
 .reviews-tag {
@@ -1039,4 +1037,4 @@ body.app-body {
     font-size: 0.8rem !important;
 }
 =======
->>>>>>> c4a8ebb (feedback add button working)
+
