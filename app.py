@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from pymongo import MongoClient
 from datetime import date, datetime, timedelta
 import requests
@@ -400,6 +400,52 @@ def get_stats():
             'success': False,
             'error': str(e)
         }), 500
+
+
+@app.route('/api/feedback', methods=['POST'])
+def submit_feedback():
+    """Accept user feedback and store it in a separate collection.
+    This is intentionally isolated from the core papers logic so it cannot
+    interfere with fetching/storing papers.
+    """
+    try:
+        data = request.get_json(force=True)
+        name = (data.get('name') or '').strip()
+        role = (data.get('role') or '').strip()
+        text = (data.get('text') or '').strip()
+
+        if not name or not role or not text:
+            return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+
+        feedback_doc = {
+            'name': name,
+            'role': role,
+            'text': text,
+            'createdAt': datetime.now()
+        }
+
+        db['feedback'].insert_one(feedback_doc)
+
+        return jsonify({'success': True}), 201
+    except Exception as e:
+        logger.warning(f"Error saving feedback: {e}")
+        # Do not raise - return a friendly error so the front-end can fallback
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@app.route('/api/feedback', methods=['GET'])
+def list_feedback():
+    """Return recent feedback items (admin-facing). Limited and safe."""
+    try:
+        items = list(db['feedback'].find({}, {'_id': 0}).sort('createdAt', -1).limit(50))
+        # serialize datetimes
+        for it in items:
+            if 'createdAt' in it and isinstance(it['createdAt'], (datetime, date)):
+                it['createdAt'] = it['createdAt'].isoformat()
+
+        return jsonify({'success': True, 'feedback': items})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # Initialize scheduler
 scheduler = BackgroundScheduler()

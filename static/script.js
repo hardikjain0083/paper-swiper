@@ -21,17 +21,20 @@ async function fetchDomainStats() {
         if (data.success) {
             const { domain_counts, last_update } = data;
 
-            if (last_update && last_update.timestamp) {
-                const lastUpdateElem = document.getElementById('lastUpdateTime');
-                const updateTime = new Date(last_update.timestamp).toLocaleTimeString();
-                lastUpdateElem.textContent = `Last Update: ${updateTime}`;
-                // store raw timestamp for "x minutes ago" text
-                lastUpdateElem.dataset.timestamp = last_update.timestamp;
-            }
+                    if (last_update && last_update.timestamp) {
+                        const lastUpdateElem = document.getElementById('lastUpdateTime');
+                        const updateTime = new Date(last_update.timestamp).toLocaleTimeString();
+                        lastUpdateElem.textContent = `Last Update: ${updateTime}`;
+                        // store raw timestamp for "x minutes ago" text
+                        lastUpdateElem.dataset.timestamp = last_update.timestamp;
+                    }
 
-            // Update domain cards with counts and new papers
-            Object.entries(domain_counts).forEach(([domain, count]) => {
-                const newPapers = last_update.domain_stats[domain] || 0;
+                    // Safely obtain per-domain new paper counts
+                    const lastDomainStats = (last_update && last_update.domain_stats) ? last_update.domain_stats : {};
+
+                    // Update domain cards with counts and new papers
+                    Object.entries(domain_counts).forEach(([domain, count]) => {
+                        const newPapers = lastDomainStats[domain] || 0;
                 const card = document.querySelector(`[data-domain="${domain}"]`);
                 if (card) {
                     const existingStats = card.querySelector('.domain-stats');
@@ -331,3 +334,114 @@ setInterval(() => {
         }
     }
 }, 60 * 1000);
+
+/* ========== REVIEWS MODAL & DYNAMIC ADD ========== */
+
+const reviewModal = document.getElementById('reviewModal');
+const openReviewModalBtn = document.getElementById('openReviewModalBtn');
+const closeReviewModalBtn = document.getElementById('closeReviewModalBtn');
+const cancelReviewBtn = document.getElementById('cancelReviewBtn');
+const reviewModalBackdrop = document.getElementById('reviewModalBackdrop');
+const reviewForm = document.getElementById('reviewForm');
+const reviewsGrid = document.querySelector('.reviews-grid');
+
+function openReviewModal() {
+    if (!reviewModal) return;
+    reviewModal.classList.add('is-open');
+    reviewModal.setAttribute('aria-hidden', 'false');
+    // ensure visible even if CSS glitches; use flex to match CSS rule
+    reviewModal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeReviewModal() {
+    if (!reviewModal) return;
+    reviewModal.classList.remove('is-open');
+    reviewModal.setAttribute('aria-hidden', 'true');
+    // hide explicitly to avoid lingering backdrop
+    reviewModal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function createReviewCard(name, role, text) {
+    const article = document.createElement('article');
+    article.className = 'review-card';
+    article.innerHTML = `
+        <img class="review-avatar"
+             src="https://randomuser.me/api/portraits/lego/1.jpg"
+             alt="User photo">
+        <div class="review-body">
+            <p class="review-text">“${text}”</p>
+            <p class="review-meta">
+                <span class="review-name">${name}</span>
+                <span class="review-role">${role}</span>
+            </p>
+        </div>
+    `;
+    return article;
+}
+
+// open
+if (openReviewModalBtn && reviewModal) {
+    openReviewModalBtn.addEventListener('click', openReviewModal);
+}
+
+// close on buttons / backdrop
+[closeReviewModalBtn, cancelReviewBtn, reviewModalBackdrop].forEach((el) => {
+    if (el) el.addEventListener('click', closeReviewModal);
+});
+
+// close on Esc
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeReviewModal();
+});
+
+// Ensure the review modal is hidden on initial load and not opened by default
+document.addEventListener('DOMContentLoaded', () => {
+    if (reviewModal) {
+        reviewModal.classList.remove('is-open');
+        reviewModal.setAttribute('aria-hidden', 'true');
+        reviewModal.style.display = 'none';
+    }
+});
+
+// handle submit
+if (reviewForm && reviewsGrid) {
+    reviewForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById('reviewName').value.trim();
+        const role = document.getElementById('reviewRole').value.trim();
+        const text = document.getElementById('reviewText').value.trim();
+
+        if (!name || !role || !text) return;
+
+        const card = createReviewCard(name, role, text);
+
+        // Try to POST feedback to the server but don't block the UI on failure.
+        // This ensures feedback works without interfering with core project behavior.
+        try {
+            const resp = await fetch('/api/feedback', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, role, text })
+            });
+
+            if (resp.ok) {
+                // Server accepted feedback; add to UI
+                reviewsGrid.appendChild(card);
+            } else {
+                // Server failed; gracefully fallback to local-only behavior
+                reviewsGrid.appendChild(card);
+            }
+        } catch (err) {
+            // Network or server error — fallback to local-only
+            console.warn('Could not send feedback to server, storing locally:', err);
+            reviewsGrid.appendChild(card);
+        }
+
+        reviewForm.reset();
+        closeReviewModal();
+    });
+}
+
