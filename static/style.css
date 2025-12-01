@@ -159,7 +159,10 @@ body.app-body {
 
 .hero-title span {
     background: linear-gradient(120deg, #22c55e, #6366f1, #a855f7);
+
     background-clip: text;
+
+
     -webkit-background-clip: text;
     color: transparent;
 }
@@ -578,6 +581,7 @@ body.app-body {
     border: 1px dashed rgba(148, 163, 184, 0.7);
 }
 
+
 /* card scrollbar */
 
 .card::-webkit-scrollbar {
@@ -590,6 +594,29 @@ body.app-body {
     background: linear-gradient(135deg, #6366f1, #a855f7);
     border-radius: 10px;
 }
+.no-more-papers {
+    text-align: center;
+    color: #e5e7eb;
+    font-size: 1rem;
+    padding: 40px 22px;
+    background: rgba(15, 23, 42, 0.96);
+    border-radius: 18px;
+    border: 1px dashed rgba(148, 163, 184, 0.7);
+}
+
+/* card scrollbar */
+
+.card::-webkit-scrollbar {
+    width: 7px;
+}
+.card::-webkit-scrollbar-track {
+    background: #020617;
+}
+.card::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    border-radius: 10px;
+}
+
 
 /* ---------- FOOTER ---------- */
 
@@ -631,6 +658,7 @@ body.app-body {
 }
 
 .reviews-tag {
+
     font-size: 0.78rem;
     padding: 5px 12px;
     border-radius: 999px;
@@ -698,8 +726,13 @@ body.app-body {
 }
 
 .review-text {
+
     font-size: 0.9rem;
     color: #e5e7eb;
+    font-size: 0.95rem;
+    color: #e5e7eb;
+    line-height: 1.65;
+
 }
 
 .review-meta {
@@ -710,6 +743,8 @@ body.app-body {
 .review-name {
     font-weight: 600;
     color: #cbd5f5;
+    font-size: 0.9rem;
+
 }
 
 /* CTA row */
@@ -739,6 +774,8 @@ body.app-body {
     gap: 6px;
     transition: all 0.18s ease-out;
     background: transparent;
+    cursor: pointer;
+
 }
 
 .btn-review:hover {
@@ -752,6 +789,134 @@ body.app-body {
     .reviews-cta {
         flex-direction: column;
         align-items: flex-start;
+    }
+}
+/* ---------- REVIEW MODAL ---------- */
+
+.review-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 40;
+}
+
+.review-modal.is-open {
+    display: flex;
+}
+
+.review-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    /* Keep a semi-opaque backdrop but avoid blurring the background to
+       prevent the entire app from appearing out-of-focus. */
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: none;
+}
+
+.review-modal-dialog {
+    position: relative;
+    z-index: 41;
+    width: min(480px, 90vw);
+    background: #020617;
+    border-radius: 18px;
+    border: 1px solid rgba(148, 163, 184, 0.8);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.85);
+    padding: 18px 18px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.review-modal-dialog h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.review-modal-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.review-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    font-size: 1.4rem;
+    cursor: pointer;
+}
+
+.review-modal-close:hover {
+    color: #e5e7eb;
+}
+
+.review-form-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.review-form-row label,
+.review-form-full {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.review-form-row input,
+.review-form-full textarea {
+    border-radius: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.7);
+    background: rgba(15, 23, 42, 0.95);
+    padding: 7px 10px;
+    font-size: 0.85rem;
+    color: #e5e7eb;
+    outline: none;
+}
+
+.review-form-row input:focus,
+.review-form-full textarea:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.5);
+}
+
+.review-form-actions {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.btn-review-secondary {
+    border-color: rgba(148, 163, 184, 0.7);
+    color: #e5e7eb;
+}
+
+.btn-review-secondary:hover {
+    background: rgba(15, 23, 42, 0.9);
+    box-shadow: none;
+}
+
+.btn-review-primary {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    color: white;
+    border: none;
+}
+
+.btn-review-primary:hover {
+    box-shadow: 0 10px 26px rgba(99,102,241,0.5);
+}
+
+@media (max-width: 480px) {
+    .review-form-row {
+        flex-direction: column;
     }
 }
 
